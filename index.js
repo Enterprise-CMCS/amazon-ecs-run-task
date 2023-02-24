@@ -10,7 +10,9 @@ const IGNORED_TASK_DEFINITION_ATTRIBUTES = [
   'taskDefinitionArn',
   'requiresAttributes',
   'revision',
-  'status'
+  'status',
+  'registeredAt',
+  'registeredBy',
 ];
 
 const WAIT_DEFAULT_DELAY_SEC = 5;
@@ -63,6 +65,7 @@ function cleanNullKeys(obj) {
 }
 
 function removeIgnoredAttributes(taskDef) {
+  core.info(IGNORED_TASK_DEFINITION_ATTRIBUTES)
   for (var attribute of IGNORED_TASK_DEFINITION_ATTRIBUTES) {
     if (taskDef[attribute]) {
       core.warning(`Ignoring property '${attribute}' in the task definition file. ` +
