@@ -8,7 +8,7 @@ on:
       paths-ignore:
         - "**.md"
 
-name: Package
+name: Package Action
 
 jobs:
   check:
