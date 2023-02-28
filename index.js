@@ -79,6 +79,10 @@ function removeIgnoredAttributes(taskDef) {
   return taskDef;
 }
 
+function createArrayFromString(str) {
+  return str.split(',');
+}
+
 async function run() {
   try {
     const agent = 'amazon-ecs-run-task-for-github-actions'
@@ -93,8 +97,8 @@ async function run() {
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
-    const subnets = core.getInput('subnets', { required: false }) || [];
-    const securityGroups = core.getInput('security-groups', { required: false }) || [];
+    const subnets = core.getInput('subnets', { required: false }) || '';
+    const securityGroups = core.getInput('security-groups', { required: false }) || '';
     const startedBy = core.getInput('started-by', { required: false }) || agent;
     const waitForFinish = core.getInput('wait-for-finish', { required: false }) || false;
     let waitForMinutes = parseInt(core.getInput('wait-for-minutes', { required: false })) || 30;
@@ -126,8 +130,8 @@ async function run() {
 
     const networkConfiguration = {
       awsvpcConfiguration: {
-        subnets: subnets,
-        securityGroups: securityGroups
+        subnets: createArrayFromString(subnets),
+        securityGroups: createArrayFromString(securityGroups)
       }
     }
 
