@@ -93,7 +93,6 @@ async function run() {
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
-    // const networkConfiguration = core.getInput('network-configuration', { required: true });
     const subnets = core.getInput('subnets', { required: false }) || [];
     const securityGroups = core.getInput('security-groups', { required: false }) || [];
     const startedBy = core.getInput('started-by', { required: false }) || agent;
@@ -126,8 +125,10 @@ async function run() {
     const clusterName = cluster ? cluster : 'default';
 
     const networkConfiguration = {
-      subnets: subnets,
-      securityGroups: securityGroups
+      awsvpcConfiguration: {
+        subnets: subnets,
+        securityGroups: securityGroups
+      }
     }
 
     core.info(`Network Configuraiton: ${networkConfiguration}`)
