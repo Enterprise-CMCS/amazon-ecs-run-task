@@ -65,7 +65,7 @@ function cleanNullKeys(obj) {
 }
 
 function removeIgnoredAttributes(taskDef) {
-  core.info(IGNORED_TASK_DEFINITION_ATTRIBUTES)
+  core.info(`ignoring attributes: ${IGNORED_TASK_DEFINITION_ATTRIBUTES}`);
   for (var attribute of IGNORED_TASK_DEFINITION_ATTRIBUTES) {
     if (taskDef[attribute]) {
       core.warning(`Ignoring property '${attribute}' in the task definition file. ` +
@@ -87,11 +87,15 @@ async function run() {
       customUserAgent: agent
     });
 
+    core.info("Getting inputs...");
+
     // Get inputs
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
     // const networkConfiguration = core.getInput('network-configuration', { required: true });
+    const subnets = core.getInput('subnets', { required: false }) || [];
+    const securityGroups = core.getInput('security-groups', { required: false }) || [];
     const startedBy = core.getInput('started-by', { required: false }) || agent;
     const waitForFinish = core.getInput('wait-for-finish', { required: false }) || false;
     let waitForMinutes = parseInt(core.getInput('wait-for-minutes', { required: false })) || 30;
@@ -121,11 +125,26 @@ async function run() {
 
     const clusterName = cluster ? cluster : 'default';
 
+    const networkConfiguration = {
+      subnets: subnets,
+      securityGroups: securityGroups
+    }
+
+    core.info(`Network Configuraiton: ${networkConfiguration}`)
+
     core.debug(`Running task with ${JSON.stringify({
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
-      // networkConfiguration: networkConfiguration,
+      networkConfiguration: networkConfiguration,
+      startedBy: startedBy
+    })}`)
+
+    core.info(`Running task with ${JSON.stringify({
+      cluster: clusterName,
+      taskDefinition: taskDefArn,
+      count: count,
+      networkConfiguration: networkConfiguration,
       startedBy: startedBy
     })}`)
 
@@ -133,7 +152,7 @@ async function run() {
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
-      // networkConfiguration: networkConfiguration,
+      networkConfiguration: networkConfiguration,
       startedBy: startedBy
     }).promise();
 
