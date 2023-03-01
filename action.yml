@@ -11,13 +11,13 @@ inputs:
     description: "The name of the ECS cluster. Will default to the 'default' cluster"
     required: true
   count:
-    description: "The count of tasks to run. Will default to the 1"
+    description: "The count of tasks to run. Will default to 1"
     required: true
   security-groups:
-    description: "The array of security groups to set in the network configuration"
+    description: "The array of security groups to set in the network configuration. Will default to an empty array."
     required: false
   subnets:
-    description: "The array of subnets to set in the network configuration"
+    description: "The array of subnets to set in the network configuration. Will default to an empty array."
     required: false
   started-by:
     description: "The value of the task started-by"

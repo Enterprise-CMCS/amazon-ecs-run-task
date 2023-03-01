@@ -65,13 +65,15 @@ function cleanNullKeys(obj) {
 }
 
 function removeIgnoredAttributes(taskDef) {
-  core.info(`ignoring attributes: ${IGNORED_TASK_DEFINITION_ATTRIBUTES}`);
+  if (IGNORED_TASK_DEFINITION_ATTRIBUTES.length > 0) {
+    core.warning(`Ignoring properties '${IGNORED_TASK_DEFINITION_ATTRIBUTES}' in the task definition file. ` +
+        'These properties are returned by the Amazon ECS DescribeTaskDefinition API and may be shown in the ECS console, ' +
+        'but they are not valid fields when registering a new task definition. ' +
+        'These fields can be safely removed from your task definition file.');
+  }
+
   for (var attribute of IGNORED_TASK_DEFINITION_ATTRIBUTES) {
     if (taskDef[attribute]) {
-      core.warning(`Ignoring property '${attribute}' in the task definition file. ` +
-        'This property is returned by the Amazon ECS DescribeTaskDefinition API and may be shown in the ECS console, ' +
-        'but it is not a valid field when registering a new task definition. ' +
-        'This field can be safely removed from your task definition file.');
       delete taskDef[attribute];
     }
   }
@@ -90,8 +92,6 @@ async function run() {
     const ecs = new aws.ECS({
       customUserAgent: agent
     });
-
-    core.info("Getting inputs...");
 
     // Get inputs
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
@@ -135,17 +135,7 @@ async function run() {
       }
     }
 
-    core.info(`Network Configuraiton: ${networkConfiguration}`)
-
     core.debug(`Running task with ${JSON.stringify({
-      cluster: clusterName,
-      taskDefinition: taskDefArn,
-      count: count,
-      networkConfiguration: networkConfiguration,
-      startedBy: startedBy
-    })}`)
-
-    core.info(`Running task with ${JSON.stringify({
       cluster: clusterName,
       taskDefinition: taskDefArn,
       count: count,
