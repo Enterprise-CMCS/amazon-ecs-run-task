@@ -82,7 +82,7 @@ function removeIgnoredAttributes(taskDef) {
 }
 
 function createArrayFromString(str) {
-  return str.split(',');
+  return str.split(/\s+/);
 }
 
 async function run() {
