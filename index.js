@@ -158,7 +158,8 @@ async function run() {
       taskDefinition: taskDefArn,
       count: count,
       networkConfiguration: networkConfiguration,
-      startedBy: startedBy
+      startedBy: startedBy,
+      launchType: "FARGATE"
     }).promise();
 
     core.debug(`Run task response ${JSON.stringify(runTaskResponse)}`)
