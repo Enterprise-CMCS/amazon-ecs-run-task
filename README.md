@@ -1,6 +1,6 @@
 ## Amazon ECS "Run Task" Action for GitHub Actions
 
-Runs an Amazon ECS task on ECS cluster.
+Runs an Amazon ECS task on ECS cluster. This action was forked from [smitp/amazon-ecs-run-task](https://github.com/smitp/amazon-ecs-run-task). It has been amended to accept subnet ids and security groups as inputs. This enables the action to run tasks with `network_mode` set to `awsvpc`. When running this kind of task, the `runTask` function requires a `network_configuration` parameter with both subnet ids and security groups specified.
 
 **Table of Contents**
 
@@ -26,11 +26,13 @@ Runs an Amazon ECS task on ECS cluster.
         task-definition: task-definition.json
         cluster: my-cluster
         count: 1
+        subnets: subnet-1, subnet-2, subnet-3
+        security-groups: sg-1, sg-2
         started-by: github-actions-${{ github.actor }}
         wait-for-finish: true
 ```
 
-See [action.yml](action.yml) for the full documentation for this action's inputs and outputs.
+`security-groups` and `subnets` can be single values or comma separated lists, such as in the example above. See [action.yml](action.yml) for the full documentation for this action's inputs and outputs.
 
 ### Task definition file
 
