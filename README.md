@@ -21,7 +21,7 @@ Runs an Amazon ECS task on ECS cluster. This action was forked from [smitp/amazo
 
 ```yaml
     - name: Run Task on Amazon ECS
-      uses: smitp/amazon-ecs-run-task@v1
+      uses: Enterprise-CMCS/amazon-ecs-run-task@master
       with:
         task-definition: task-definition.json
         cluster: my-cluster
@@ -96,7 +96,7 @@ The task definition file can be updated prior to deployment with the new contain
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Run Task on Amazon ECS
-      uses: smitp/amazon-ecs-run-task@v1
+      uses: Enterprise-CMCS/amazon-ecs-run-task@master
       with:
         task-definition: task-definition.json
         cluster: my-cluster
