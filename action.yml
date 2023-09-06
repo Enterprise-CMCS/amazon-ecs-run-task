@@ -5,8 +5,10 @@ branding:
   color: 'orange'
 inputs:
   task-definition:
-    description: 'The name of ECS task definition'
+    description: 'The filename (<file>.json) of the ECS task definition'
     required: true
+  task-definition-arn:
+    description: 'The ECS task definition ARN'
   cluster:
     description: "The name of the ECS cluster. Will default to the 'default' cluster"
     required: true

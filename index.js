@@ -95,6 +95,7 @@ async function run() {
 
     // Get inputs
     const taskDefinitionFile = core.getInput('task-definition', { required: true });
+    const taskDefArnToRun = core.getInput('task-definition-arn', { required: true });
     const cluster = core.getInput('cluster', { required: false });
     const count = core.getInput('count', { required: true });
     const subnets = core.getInput('subnets', { required: false }) || '';
@@ -106,26 +107,7 @@ async function run() {
       waitForMinutes = MAX_WAIT_MINUTES;
     }
 
-    // Register the task definition
-    core.debug('Registering the task definition');
-    const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
-      taskDefinitionFile :
-      path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
-    const fileContents = fs.readFileSync(taskDefPath, 'utf8');
-    const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
-
-    let registerResponse;
-    try {
-      registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
-    } catch (error) {
-      core.setFailed("Failed to register task definition in ECS: " + error.message);
-      core.debug("Task definition contents:");
-      core.debug(JSON.stringify(taskDefContents, undefined, 4));
-      throw(error);
-    }
-    const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
-    core.setOutput('task-definition-arn', taskDefArn);
-
+    // Run task from the input task definition
     const clusterName = cluster ? cluster : 'default';
 
     const networkConfiguration = {
@@ -137,7 +119,7 @@ async function run() {
 
     core.debug(`Running task with ${JSON.stringify({
       cluster: clusterName,
-      taskDefinition: taskDefArn,
+      taskDefinition: taskDefArnToRun,
       count: count,
       networkConfiguration: networkConfiguration,
       startedBy: startedBy
@@ -145,7 +127,7 @@ async function run() {
 
     const runTaskResponse = await ecs.runTask({
       cluster: clusterName,
-      taskDefinition: taskDefArn,
+      taskDefinition: taskDefArnToRun,
       count: count,
       networkConfiguration: networkConfiguration,
       startedBy: startedBy,
@@ -172,6 +154,26 @@ async function run() {
     core.setFailed(error.message);
     core.debug(error.stack);
   }
+
+  // Register the task definition that was used to run the task
+  core.debug('Registering the task definition');
+  const taskDefPath = path.isAbsolute(taskDefinitionFile) ?
+    taskDefinitionFile :
+    path.join(process.env.GITHUB_WORKSPACE, taskDefinitionFile);
+  const fileContents = fs.readFileSync(taskDefPath, 'utf8');
+  const taskDefContents = removeIgnoredAttributes(cleanNullKeys(yaml.parse(fileContents)));
+
+  let registerResponse;
+  try {
+    registerResponse = await ecs.registerTaskDefinition(taskDefContents).promise();
+  } catch (error) {
+    core.setFailed("Failed to register task definition in ECS: " + error.message);
+    core.debug("Task definition contents:");
+    core.debug(JSON.stringify(taskDefContents, undefined, 4));
+    throw(error);
+  }
+  const taskDefArn = registerResponse.taskDefinition.taskDefinitionArn;
+  core.setOutput('task-definition-arn', taskDefArn);
 }
 
 async function waitForTasksStopped(ecs, clusterName, taskArns, waitForMinutes) {
