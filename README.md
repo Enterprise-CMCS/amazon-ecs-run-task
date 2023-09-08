@@ -107,7 +107,7 @@ The task definition file can be updated prior to deployment with the new contain
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Run Task on Amazon ECS
-      uses: Enterprise-CMCS/amazon-ecs-run-task@master
+      uses: Enterprise-CMCS/amazon-ecs-run-task@vXYZ
       with:
         task-definition: task-definition.json
         task-definition-arn: arn:aws:ecs:us-east-1:12345:task-definition/mytask-dev:42
